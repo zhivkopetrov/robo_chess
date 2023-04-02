@@ -1,0 +1,36 @@
+[submodule "src/ur_dev/ur_dev_helpers"]
+	path = src/ur_dev/ur_dev_helpers
+	url = https://github.com/zhivkopetrov/ur_dev_helpers.git
+[submodule "src/lib/utils"]
+	path = src/lib/utils
+	url = https://github.com/zhivkopetrov/utils.git
+[submodule "src/lib/resource_utils"]
+	path = src/lib/resource_utils
+	url = https://github.com/zhivkopetrov/resource_utils.git
+[submodule "src/lib/sdl_utils"]
+	path = src/lib/sdl_utils
+	url = https://github.com/zhivkopetrov/sdl_utils.git
+[submodule "src/lib/manager_utils"]
+	path = src/lib/manager_utils
+	url = https://github.com/zhivkopetrov/manager_utils.git
+[submodule "src/lib/game_engine"]
+	path = src/lib/game_engine
+	url = https://github.com/zhivkopetrov/game_engine.git
+[submodule "src/lib/ros2_game_engine"]
+	path = src/lib/ros2_game_engine
+	url = https://github.com/zhivkopetrov/ros2_game_engine.git
+[submodule "src/lib/cmake_helpers"]
+	path = src/lib/cmake_helpers
+	url = https://github.com/zhivkopetrov/cmake_helpers.git
+[submodule "src/ur_driver/Universal_Robots_ROS2_Driver"]
+	path = src/ur_driver/Universal_Robots_ROS2_Driver
+	url = https://github.com/zhivkopetrov/Universal_Robots_ROS2_Driver.git
+[submodule "src/ur_driver/Universal_Robots_Client_Library"]
+	path = src/ur_driver/Universal_Robots_Client_Library
+	url = https://github.com/zhivkopetrov/Universal_Robots_Client_Library.git
+[submodule "src/ur_driver/Universal_Robots_ROS2_Description"]
+	path = src/ur_driver/Universal_Robots_ROS2_Description
+	url = https://github.com/zhivkopetrov/Universal_Robots_ROS2_Description.git
+[submodule "src/tools"]
+	path = src/tools
+	url = https://github.com/zhivkopetrov/tools.git
