@@ -10,7 +10,6 @@
 #include "utils/ErrorCode.h"
 
 //Own components headers
-#include "robo_chess/external_api/config/RoboChessExternalInterfaceConfig.h"
 
 //Forward declarations
 
@@ -20,7 +19,7 @@ class RoboChessExternalInterface: public rclcpp::Node,
 public:
   RoboChessExternalInterface();
 
-  ErrorCode init(const RoboChessExternalInterfaceConfig& cfg);
+  ErrorCode init();
 
 private:
   ErrorCode initCommunication();

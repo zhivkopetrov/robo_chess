@@ -4,12 +4,11 @@
 //System headers
 
 //Other libraries headers
-#include "game_engine/communicator/NullCommunicator.h"
-#include "utils/debug/SignalHandler.h"
 #include "utils/ErrorCode.h"
 #include "utils/Log.h"
 
 //Own components headers
+#include "robo_chess/core/helpers/RoboChessApplicationInitHelper.h"
 
 RoboChessApplication::~RoboChessApplication() noexcept {
   LOGG("RoboChess initiating shutdown ...");
@@ -32,25 +31,20 @@ ErrorCode RoboChessApplication::loadDependencies(
 }
 
 ErrorCode RoboChessApplication::init(const RoboChessConfig &cfg) {
-  _communicator = std::make_unique<Ros2Communicator>();
-  if (ErrorCode::SUCCESS != _communicator->init(cfg.ros2CommunicatorCfg)) {
-    LOGERR("Error in _communicator.init()");
+  if (ErrorCode::SUCCESS != RoboChessApplicationInitHelper::init(cfg, *this)) {
+    LOGERR("Error in RoboChessApplicationInitHelper.init()");
     return ErrorCode::FAILURE;
   }
 
-  _externalInterface = std::make_shared<RoboChessExternalInterface>();
-  if (ErrorCode::SUCCESS !=
-      _externalInterface->init(cfg.externalInterfaceCfg)) {
-    LOGERR("Error in _externalInterface.init()");
-    return ErrorCode::FAILURE;
-  }
-
-  _communicator->registerNode(_externalInterface);
+  _communicator->registerNode(_urControlExternalInterface);
+  _communicator->registerNode(_roboChessExternalInterface);
   return ErrorCode::SUCCESS;
 }
 
 ErrorCode RoboChessApplication::run() {
   LOGG("Starting RoboChess Application");
+
+  _actionEventHandlerSpawner.spawnAndRun();
 
   //blocking call
   _communicator->start();
@@ -59,12 +53,12 @@ ErrorCode RoboChessApplication::run() {
 }
 
 void RoboChessApplication::deinit() {
-  //manually reset point after deinit to enforce destruction order
-  _communicator->unregisterNode(_externalInterface);
-  _externalInterface.reset();
+  _actionEventHandlerSpawner.shutdown();
+
+  _communicator->unregisterNode(_roboChessExternalInterface);
+  _communicator->unregisterNode(_urControlExternalInterface);
 
   _communicator->deinit();
-  _communicator.reset();
 }
 
 void RoboChessApplication::unloadDependencies() {

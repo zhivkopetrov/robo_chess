@@ -6,6 +6,7 @@
 #include <memory>
 
 //Other libraries headers
+#include "ur_control_common/external_api/UrControlCommonExternalBridge.h"
 #include "ros2_game_engine/communicator/Ros2Communicator.h"
 #include "game_engine/defines/DependencyDefines.h"
 #include "utils/class/NonCopyable.h"
@@ -14,12 +15,16 @@
 
 //Own components headers
 #include "robo_chess/core/config/RoboChessConfig.h"
+#include "robo_chess/core/helpers/ActionEventHandlerSpawner.h"
+#include "robo_chess/core/helpers/RobotModeHandler.h"
 #include "robo_chess/external_api/RoboChessExternalInterface.h"
 
 //Forward declarations
 
 class RoboChessApplication : public NonCopyable, public NonMoveable {
 public:
+  friend class RoboChessApplicationInitHelper;
+
   ~RoboChessApplication() noexcept;
 
   ErrorCode loadDependencies(
@@ -36,7 +41,10 @@ private:
   std::vector<DependencyDescription> _dependencies;
 
   std::unique_ptr<Ros2Communicator> _communicator;
-  std::shared_ptr<RoboChessExternalInterface> _externalInterface;
+  std::shared_ptr<RoboChessExternalInterface> _roboChessExternalInterface;
+  std::shared_ptr<UrControlCommonExternalBridge> _urControlExternalInterface;
+  ActionEventHandlerSpawner _actionEventHandlerSpawner;
+  RobotModeHandler _robotModeHandler;
 };
 
 #endif /* ROBO_CHESS_ROBOCHESSAPPLICATION_H_ */

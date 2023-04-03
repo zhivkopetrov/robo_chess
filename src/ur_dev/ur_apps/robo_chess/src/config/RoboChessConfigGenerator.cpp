@@ -11,9 +11,9 @@
 #include "robo_chess/external_api/RoboChessRos2ParamProvider.h"
 
 namespace {
-RoboChessExternalInterfaceConfig generetaRoboChessExternalInterfaceConfig(
+UrContolCommonExternalBridgeConfig generetaUrContolCommonExternalBridgeConfig(
     const RoboChessRos2Params& params) {
-  RoboChessExternalInterfaceConfig cfg;
+  UrContolCommonExternalBridgeConfig cfg;
   cfg.robotIp = params.robotIp;
   cfg.robotInterfacePort = params.robotInterfacePort;
 
@@ -24,7 +24,8 @@ Ros2CommunicatorConfig generateRos2CommunicatorConfig(
     const RoboChessRos2Params& params) {
   Ros2CommunicatorConfig cfg = params.ros2CommunicatorCfg;
 
-  //block the main thread from the executor
+  //block the main thread and wait for shutdown signal
+  //a secondary (ActionEventHandler thread) will be spawned to process ActionEvents
   cfg.executionPolicy = ExecutionPolicy::BLOCKING;
 
   return cfg;
@@ -66,9 +67,10 @@ RoboChessConfig RoboChessConfigGenerator::generateConfig() {
   const auto rosParams = paramProviderNode->getParams();
   rosParams.print();
 
-  cfg.externalInterfaceCfg =
-      generetaRoboChessExternalInterfaceConfig(rosParams);
+  cfg.urControlExternalInterfaceCfg =
+      generetaUrContolCommonExternalBridgeConfig(rosParams);
   cfg.ros2CommunicatorCfg = generateRos2CommunicatorConfig(rosParams);
+  cfg.actionEventHandlerPolicy = ActionEventHandlerPolicy::BLOCKING;
 
   return cfg;
 }

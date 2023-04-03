@@ -21,13 +21,18 @@ add_executable(
 		${_INC_DIR}/config/RoboChessConfigGenerator.h
         ${_INC_DIR}/core/config/RoboChessConfig.h
 		${_INC_DIR}/core/RoboChessApplication.h
+        ${_INC_DIR}/core/helpers/RoboChessApplicationInitHelper.h
+        ${_INC_DIR}/core/helpers/ActionEventHandlerSpawner.h
+        ${_INC_DIR}/core/helpers/RobotModeHandler.h
 		${_INC_DIR}/external_api/RoboChessExternalInterface.h
 		${_INC_DIR}/external_api/RoboChessRos2ParamProvider.h
-		${_INC_DIR}/external_api/config/RoboChessExternalInterfaceConfig.h
 		${_INC_DIR}/defines/RoboChessDefines.h
      
 		${_SRC_DIR}/config/RoboChessConfigGenerator.cpp
 		${_SRC_DIR}/core/RoboChessApplication.cpp
+        ${_SRC_DIR}/core/helpers/RoboChessApplicationInitHelper.cpp
+        ${_SRC_DIR}/core/helpers/ActionEventHandlerSpawner.cpp
+        ${_SRC_DIR}/core/helpers/RobotModeHandler.cpp
 		${_SRC_DIR}/external_api/RoboChessExternalInterface.cpp
 		${_SRC_DIR}/external_api/RoboChessRos2ParamProvider.cpp
 		${_SRC_DIR}/main.cpp
@@ -48,7 +53,7 @@ target_link_libraries(
     ${PROJECT_NAME}
         PRIVATE
             ros2_game_engine::ros2_game_engine
-            urscript_common::urscript_common
+            ur_control_common::ur_control_common
 )
 
 # TODO add msg/service dependencies

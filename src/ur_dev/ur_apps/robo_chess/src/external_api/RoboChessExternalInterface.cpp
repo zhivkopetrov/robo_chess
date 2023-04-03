@@ -9,7 +9,7 @@
 //Own components headers
 
 namespace {
-constexpr auto NODE_NAME = "robo_chess";
+constexpr auto NODE_NAME = "RoboChessExternalInterface";
 }
 
 RoboChessExternalInterface::RoboChessExternalInterface()
@@ -17,8 +17,7 @@ RoboChessExternalInterface::RoboChessExternalInterface()
 
 }
 
-ErrorCode RoboChessExternalInterface::init(
-    [[maybe_unused]]const RoboChessExternalInterfaceConfig &cfg) {
+ErrorCode RoboChessExternalInterface::init() {
   if (ErrorCode::SUCCESS != initCommunication()) {
     LOGERR("Error, initCommunication() failed");
     return ErrorCode::FAILURE;
