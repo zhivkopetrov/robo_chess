@@ -1,0 +1,79 @@
+# Author Zhivko Petrov
+
+cmake_minimum_required(VERSION 3.10)
+
+project(
+    robo_chess
+    LANGUAGES CXX
+    VERSION 2.0.0
+)
+
+find_package(cmake_helpers REQUIRED)
+find_package(ur_control_common REQUIRED)
+find_package(ros2_game_engine REQUIRED)
+
+set(_INC_FOLDER_NAME include)
+set(_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${_INC_FOLDER_NAME}/${PROJECT_NAME})
+set(_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+add_executable(
+    ${PROJECT_NAME}
+		${_INC_DIR}/config/RoboChessConfigGenerator.h
+        ${_INC_DIR}/core/config/RoboChessConfig.h
+		${_INC_DIR}/core/RoboChessApplication.h
+		${_INC_DIR}/external_api/RoboChessExternalInterface.h
+		${_INC_DIR}/external_api/RoboChessRos2ParamProvider.h
+		${_INC_DIR}/external_api/config/RoboChessExternalInterfaceConfig.h
+		${_INC_DIR}/defines/RoboChessDefines.h
+     
+		${_SRC_DIR}/config/RoboChessConfigGenerator.cpp
+		${_SRC_DIR}/core/RoboChessApplication.cpp
+		${_SRC_DIR}/external_api/RoboChessExternalInterface.cpp
+		${_SRC_DIR}/external_api/RoboChessRos2ParamProvider.cpp
+		${_SRC_DIR}/main.cpp
+)
+
+target_include_directories(
+    ${PROJECT_NAME} 
+        PRIVATE
+            $<BUILD_INTERFACE:
+                ${CMAKE_CURRENT_SOURCE_DIR}/${_INC_FOLDER_NAME}
+            >
+            $<INSTALL_INTERFACE:
+                ${_INC_FOLDER_NAME}
+            >
+)
+
+target_link_libraries(
+    ${PROJECT_NAME}
+        PRIVATE
+            ros2_game_engine::ros2_game_engine
+            urscript_common::urscript_common
+)
+
+# TODO add msg/service dependencies
+# ament_target_dependencies(
+#     ${PROJECT_NAME}
+# 		PUBLIC
+
+# )
+
+if(NOT DISABLE_ROS_TOOLING)
+    # Ament uses non-monolith build (separate build and install steps).
+    # The helpers.cmake has to be included manually.
+    # This allows access to the helpers.cmake user defined macros
+    # In the case of monolith build - the file is automatically included
+    # from the cmake_helpersConfig.cmake when the package is consumed by find_package()
+	include(${cmake_helpers_DIR}/helpers.cmake)
+	
+    enable_ros_tooling_for_target(
+        ${PROJECT_NAME}
+        ${CMAKE_CURRENT_SOURCE_DIR}/package.xml
+    )
+endif()
+
+set_target_cpp_standard(${PROJECT_NAME} 20)
+enable_target_warnings(${PROJECT_NAME})
+set_target_visibility(${PROJECT_NAME})
+# enable_target_sanitizer(${PROJECT_NAME} "thread")
+
