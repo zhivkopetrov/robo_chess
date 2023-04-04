@@ -11,6 +11,7 @@ project(
 find_package(cmake_helpers REQUIRED)
 find_package(ur_control_common REQUIRED)
 find_package(ros2_game_engine REQUIRED)
+find_package(robo_chess_interfaces REQUIRED)
 
 set(_INC_FOLDER_NAME include)
 set(_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${_INC_FOLDER_NAME}/${PROJECT_NAME})
@@ -56,12 +57,11 @@ target_link_libraries(
             ur_control_common::ur_control_common
 )
 
-# TODO add msg/service dependencies
-# ament_target_dependencies(
-#     ${PROJECT_NAME}
-# 		PUBLIC
-
-# )
+ament_target_dependencies(
+    ${PROJECT_NAME}
+		PUBLIC
+            robo_chess_interfaces
+)
 
 if(NOT DISABLE_ROS_TOOLING)
     # Ament uses non-monolith build (separate build and install steps).

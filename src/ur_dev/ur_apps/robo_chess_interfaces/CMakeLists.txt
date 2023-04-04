@@ -11,7 +11,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     "srv/RobotAbortMotion.srv"
     "srv/RobotChessMove.srv"
     "srv/RobotPark.srv"
-    "srv/SetParkMode.srv"
+    "srv/RobotSetParkMode.srv"
 )
 
 set_target_properties(

@@ -12,9 +12,11 @@
   <build_depend>cmake_helpers</build_depend>
   <build_depend>ur_control_common</build_depend>
   <build_depend>ros2_game_engine</build_depend>
+  <build_depend>robo_chess_interfaces</build_depend>
 
   <exec_depend>ur_control_common</exec_depend>
   <exec_depend>ros2_game_engine</exec_depend>
+  <exec_depend>robo_chess_interfaces</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
