@@ -1,0 +1,12 @@
+# set Parking mode (AUTOMATIC/MANUAL)
+
+# Automatically perform RobotPark after a successful RobotChessMove
+int32 PARK_MODE_AUTOMATIC = 0
+
+# User will have to manually invoke RobotPark
+int32 PARK_MODE_MANUAL = 1
+
+int32 park_mode
+---
+bool success
+string error_reason

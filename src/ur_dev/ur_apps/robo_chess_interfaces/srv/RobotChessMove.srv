@@ -1,0 +1,9 @@
+int32 NON_CAPTURE_MOVE = 0
+int32 CAPTURE_MOVE = 1
+
+int32 move_type
+string curr_pos
+string future_pos
+---
+bool success
+string error_reason
