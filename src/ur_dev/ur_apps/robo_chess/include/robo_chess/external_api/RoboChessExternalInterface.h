@@ -26,33 +26,33 @@ public:
   ErrorCode init();
 
 private:
-  using AbortMotion = robo_chess_interfaces::srv::RobotAbortMotion;
-  using ChessMove = robo_chess_interfaces::srv::RobotChessMove;
-  using Park = robo_chess_interfaces::srv::RobotPark;
-  using SetParkMode = robo_chess_interfaces::srv::RobotSetParkMode;
+  using RobotAbortMotion = robo_chess_interfaces::srv::RobotAbortMotion;
+  using RobotChessMove = robo_chess_interfaces::srv::RobotChessMove;
+  using RobotPark = robo_chess_interfaces::srv::RobotPark;
+  using RobotSetParkMode = robo_chess_interfaces::srv::RobotSetParkMode;
 
   ErrorCode initCommunication();
 
   void handleAbortMotionService(
-    const std::shared_ptr<AbortMotion::Request> request,
-    std::shared_ptr<AbortMotion::Response> response);
+    const std::shared_ptr<RobotAbortMotion::Request> request,
+    std::shared_ptr<RobotAbortMotion::Response> response);
 
   void handleChessMoveService(
-    const std::shared_ptr<ChessMove::Request> request,
-    std::shared_ptr<ChessMove::Response> response);
+    const std::shared_ptr<RobotChessMove::Request> request,
+    std::shared_ptr<RobotChessMove::Response> response);
 
   void handleParkService(
-    const std::shared_ptr<Park::Request> request,
-    std::shared_ptr<Park::Response> response);
+    const std::shared_ptr<RobotPark::Request> request,
+    std::shared_ptr<RobotPark::Response> response);
 
   void handleSetParkModeService(
-    const std::shared_ptr<SetParkMode::Request> request,
-    std::shared_ptr<SetParkMode::Response> response);
+    const std::shared_ptr<RobotSetParkMode::Request> request,
+    std::shared_ptr<RobotSetParkMode::Response> response);
 
-  rclcpp::Service<AbortMotion>::SharedPtr _abortMotionService;
-  rclcpp::Service<ChessMove>::SharedPtr _chessMoveService;
-  rclcpp::Service<Park>::SharedPtr _parkService;
-  rclcpp::Service<SetParkMode>::SharedPtr _setParkModeService;
+  rclcpp::Service<RobotAbortMotion>::SharedPtr _abortMotionService;
+  rclcpp::Service<RobotChessMove>::SharedPtr _chessMoveService;
+  rclcpp::Service<RobotPark>::SharedPtr _parkService;
+  rclcpp::Service<RobotSetParkMode>::SharedPtr _setParkModeService;
 
   const rclcpp::CallbackGroup::SharedPtr _callbackGroup = create_callback_group(
       rclcpp::CallbackGroupType::Reentrant);

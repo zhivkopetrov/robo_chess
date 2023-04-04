@@ -11,7 +11,7 @@ project(
 find_package(cmake_helpers REQUIRED)
 find_package(ur_control_common REQUIRED)
 find_package(ros2_game_engine REQUIRED)
-find_package(robo_chess_interfaces REQUIRED)
+find_package(robo_chess_common REQUIRED)
 
 set(_INC_FOLDER_NAME include)
 set(_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${_INC_FOLDER_NAME}/${PROJECT_NAME})
@@ -29,7 +29,6 @@ add_executable(
 		${_INC_DIR}/external_api/RoboChessRos2ParamProvider.h
 		${_INC_DIR}/defines/RoboChessDefines.h
         ${_INC_DIR}/defines/RoboChessFunctionalDefines.h
-        ${_INC_DIR}/defines/RoboChessTopics.h
      
 		${_SRC_DIR}/config/RoboChessConfigGenerator.cpp
 		${_SRC_DIR}/core/RoboChessApplication.cpp
@@ -57,12 +56,13 @@ target_link_libraries(
         PRIVATE
             ros2_game_engine::ros2_game_engine
             ur_control_common::ur_control_common
+            robo_chess_common::robo_chess_common
 )
 
 ament_target_dependencies(
     ${PROJECT_NAME}
 		PUBLIC
-            robo_chess_interfaces
+            robo_chess_common
 )
 
 if(NOT DISABLE_ROS_TOOLING)
