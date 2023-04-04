@@ -9,13 +9,19 @@
 
 //Forward declarations
 
-namespace services {
+enum class ParkMode {
+  AUTOMATIC,
+  MANUAL
+};
 
-constexpr auto ABORT_MOTION_NAME = "robot_abort_motion";
-constexpr auto CHESS_MOVE_NAME = "robot_chess_move";
-constexpr auto PARK_NAME = "robot_park";
-constexpr auto SET_PARK_MODE_NAME = "robot_set_park_mode";
+enum class AbortMotion {
+  GRACEFUL_STOP,
+  IMMEDIATE_ABORT
+};
 
-} //namespace topics
+enum class ChessMoveType {
+  NON_CAPTURE_MOVE,
+  CAPTURE_MOVE
+};
 
 #endif /* ROBO_CHESS_ROBOCHESSDEFINES_H_ */

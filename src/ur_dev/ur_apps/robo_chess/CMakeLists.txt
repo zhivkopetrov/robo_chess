@@ -28,6 +28,8 @@ add_executable(
 		${_INC_DIR}/external_api/RoboChessExternalInterface.h
 		${_INC_DIR}/external_api/RoboChessRos2ParamProvider.h
 		${_INC_DIR}/defines/RoboChessDefines.h
+        ${_INC_DIR}/defines/RoboChessFunctionalDefines.h
+        ${_INC_DIR}/defines/RoboChessTopics.h
      
 		${_SRC_DIR}/config/RoboChessConfigGenerator.cpp
 		${_SRC_DIR}/core/RoboChessApplication.cpp

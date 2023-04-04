@@ -7,7 +7,7 @@
 #include "utils/Log.h"
 
 //Own components headers
-#include "robo_chess/defines/RoboChessDefines.h"
+#include "robo_chess/defines/RoboChessTopics.h"
 
 namespace {
 constexpr auto NODE_NAME = "RoboChessExternalInterface";
