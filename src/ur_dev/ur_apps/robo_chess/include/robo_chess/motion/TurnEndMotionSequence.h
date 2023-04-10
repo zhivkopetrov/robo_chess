@@ -24,19 +24,8 @@ public:
   ErrorCode setTransportStrategy(int32_t strategyId) override;
 
 private:
-  //==========START stateful commands===========
-  UrscriptCommand generateGraspCommand();
-
-  //used for TurnEndEndStrategy::PLACE_AND_RETURN_HOME strategy
-  UrscriptCommand generatePlaceCommand();
-
-  //used for TurnEndEndStrategy::WAIT_AFTER_TRANSPORT strategy
-  UrscriptCommand generateHandoverCommand();
-
-  UrscriptCommand generateTransportCommand();
-
-  UrscriptCommand generateRetractAndReturnHomeCommand() const;
-  UrscriptCommand generateReturnHomeCommand() const;
+  UrscriptCommand generateRetractCommand() const;
+  UrscriptCommand generateTransportAndClickCommand() const;
   UrscriptCommand generateGripperActuateCommand(GripperActuateType type) const;
 
   const TurnEndMotionSequenceConfig _cfg;

@@ -47,17 +47,13 @@ TurnEndMotionSequenceConfig generateTurnEndMotionSequenceConfig() {
   cfg.motionVel = DEFAULT_MOTION_VELOCITY;
 
   //TODO parse from files
-  cfg.homeCartesian = WAYPOINT_HOME_CARTESIAN;
   cfg.turnEndApproachCartesian = WaypointCartesian(
     Point3d(-0.196, -0.812, 0.6), HOME_ORIENTATION);
   cfg.turnEndCartesian = WaypointCartesian(
     Point3d(-0.196, -0.812, 0.236), HOME_ORIENTATION);
 
-  cfg.homeJoint = WAYPOINT_HOME_JOINT;
-
   cfg.turnEndJoint = 
     WaypointJoint({ -92.42, -127.52, -126.75, 74.27, 91.99, 0 });
-
   cfg.turnEndApproachJoint = 
     WaypointJoint({ -92.42, -94.62, -118.4, 33.02, 92.71, 0 });
 
@@ -84,13 +80,11 @@ ChessMoveMotionSequenceConfig generateChessMoveMotionSequenceConfig() {
   cfg.motionVel = DEFAULT_MOTION_VELOCITY;
 
   //TODO parse from files
-  cfg.homeJoint = WAYPOINT_HOME_JOINT;
   cfg.graspApproachJoint = 
     WaypointJoint({ -34.79, -99.07, -82.88, -88.33, 90.22, 55.23 });
 
   cfg.zeroOrientation = HOME_ORIENTATION;
   cfg.ninetyOrientation = HOME_NINENY_ORIENTATION;
-  cfg.homeCartesian = WAYPOINT_HOME_CARTESIAN;
   cfg.graspApproachCartesian = WaypointCartesian(
     Point3d(0.545, -0.592, 0.475), HOME_ORIENTATION);
 

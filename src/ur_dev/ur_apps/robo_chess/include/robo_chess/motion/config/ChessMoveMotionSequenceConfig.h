@@ -27,10 +27,8 @@ struct ChessMoveMotionSequenceConfig {
   double motionAcc = 0.0; //[m/s2]
   double motionVel = 0.0; //[m/s]
 
-  WaypointJoint homeJoint;
   WaypointJoint graspApproachJoint;
 
-  WaypointCartesian homeCartesian;
   WaypointCartesian graspApproachCartesian;
 };
 

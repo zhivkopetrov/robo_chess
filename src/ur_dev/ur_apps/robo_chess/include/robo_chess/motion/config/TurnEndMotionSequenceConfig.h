@@ -14,11 +14,9 @@ struct TurnEndMotionSequenceConfig {
   double motionAcc = 0.0; //[m/s2]
   double motionVel = 0.0; //[m/s]
 
-  WaypointJoint homeJoint;
   WaypointJoint turnEndJoint;
   WaypointJoint turnEndApproachJoint;
 
-  WaypointCartesian homeCartesian;
   WaypointCartesian turnEndCartesian;
   WaypointCartesian turnEndApproachCartesian;
 };
