@@ -7,6 +7,7 @@
 
 //Other libraries headers
 #include "ur_control_common/external_api/UrControlCommonExternalBridge.h"
+#include "ur_control_common/external_api/DashboardProvider.h"
 #include "ros2_game_engine/communicator/Ros2Communicator.h"
 #include "game_engine/defines/DependencyDefines.h"
 #include "utils/class/NonCopyable.h"
@@ -14,7 +15,7 @@
 #include "utils/ErrorCode.h"
 
 //Own components headers
-#include "robo_chess/core/config/RoboChessConfig.h"
+#include "robo_chess/config/RoboChessConfig.h"
 #include "robo_chess/core/helpers/ActionEventHandlerSpawner.h"
 #include "robo_chess/core/helpers/RobotModeHandler.h"
 #include "robo_chess/external_api/RoboChessExternalInterface.h"
@@ -39,12 +40,14 @@ private:
   void unloadDependencies();
 
   std::vector<DependencyDescription> _dependencies;
+  ActionEventHandlerSpawner _actionEventHandlerSpawner;
+  RobotModeHandler _robotModeHandler;
 
+  //ROS2 related objects
+  std::shared_ptr<DashboardProvider> _dashboardProvider;
   std::unique_ptr<Ros2Communicator> _communicator;
   std::shared_ptr<RoboChessExternalInterface> _roboChessExternalInterface;
   std::shared_ptr<UrControlCommonExternalBridge> _urControlExternalInterface;
-  ActionEventHandlerSpawner _actionEventHandlerSpawner;
-  RobotModeHandler _robotModeHandler;
 };
 
 #endif /* ROBO_CHESS_ROBOCHESSAPPLICATION_H_ */

@@ -9,7 +9,7 @@
 #include "game_engine/defines/DependencyDefines.h"
 
 //Own components headers
-#include "robo_chess/core/config/RoboChessConfig.h"
+#include "robo_chess/config/RoboChessConfig.h"
 
 //Forward declarations
 

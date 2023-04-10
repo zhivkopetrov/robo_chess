@@ -36,6 +36,7 @@ ErrorCode RoboChessApplication::init(const RoboChessConfig &cfg) {
     return ErrorCode::FAILURE;
   }
 
+  _communicator->registerNode(_dashboardProvider);
   _communicator->registerNode(_urControlExternalInterface);
   _communicator->registerNode(_roboChessExternalInterface);
   return ErrorCode::SUCCESS;
@@ -55,6 +56,7 @@ ErrorCode RoboChessApplication::run() {
 void RoboChessApplication::deinit() {
   _actionEventHandlerSpawner.shutdown();
 
+  _communicator->unregisterNode(_dashboardProvider);
   _communicator->unregisterNode(_roboChessExternalInterface);
   _communicator->unregisterNode(_urControlExternalInterface);
 

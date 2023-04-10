@@ -27,6 +27,13 @@ private:
 
   static ErrorCode initUrControlExternalBridge(
     const UrContolCommonExternalBridgeConfig& cfg, RoboChessApplication& app);
+
+  static ErrorCode initDashboardHelper(
+      const UrControlCommonLayoutInterface &layoutInterface, 
+      UrControlBloom &bloom);
+
+  static ErrorCode initMotionExecutor(
+    const UrControlBloomMotionSequenceConfig &cfg, UrControlBloom &bloom);
 };
 
 #endif /* ROBO_CHESS_ROBOCHESSAPPLICATIONINITHELPER_H_ */

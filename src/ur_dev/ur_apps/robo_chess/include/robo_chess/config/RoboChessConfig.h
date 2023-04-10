@@ -11,12 +11,14 @@
 #include "game_engine/defines/ActionEventDefines.h"
 
 //Own components headers
+#include "robo_chess/motion/config/RoboChessMotionSequenceConfig.h"
 
 //Forward declarations
 
 struct RoboChessConfig {
   Ros2CommunicatorConfig ros2CommunicatorCfg;
   UrContolCommonExternalBridgeConfig urControlExternalInterfaceCfg;
+  RoboChessMotionSequenceConfig roboChessMotionSequenceCfg;
   ActionEventHandlerPolicy actionEventHandlerPolicy = 
     ActionEventHandlerPolicy::BLOCKING;
 };

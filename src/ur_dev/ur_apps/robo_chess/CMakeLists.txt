@@ -20,13 +20,20 @@ set(_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_executable(
     ${PROJECT_NAME}
 		${_INC_DIR}/config/RoboChessConfigGenerator.h
-        ${_INC_DIR}/core/config/RoboChessConfig.h
+        ${_INC_DIR}/config/RoboChessConfig.h
 		${_INC_DIR}/core/RoboChessApplication.h
         ${_INC_DIR}/core/helpers/RoboChessApplicationInitHelper.h
         ${_INC_DIR}/core/helpers/ActionEventHandlerSpawner.h
         ${_INC_DIR}/core/helpers/RobotModeHandler.h
 		${_INC_DIR}/external_api/RoboChessExternalInterface.h
 		${_INC_DIR}/external_api/RoboChessRos2ParamProvider.h
+        ${_INC_DIR}/motion/ChessMoveMotionSequence.h
+        ${_INC_DIR}/motion/ChessMoveMotionSequence.h
+        ${_INC_DIR}/motion/ParkMotionSequence.h
+        ${_INC_DIR}/motion/config/ParkMotionSequenceConfig.h
+        ${_INC_DIR}/motion/config/RoboChessMotionSequenceConfig.h
+        ${_INC_DIR}/motion/config/TurnEndMotionSequenceConfig.h
+        ${_INC_DIR}/motion/config/RoboChessSequenceConfig.h
 		${_INC_DIR}/defines/RoboChessDefines.h
         ${_INC_DIR}/defines/RoboChessFunctionalDefines.h
      
@@ -37,6 +44,9 @@ add_executable(
         ${_SRC_DIR}/core/helpers/RobotModeHandler.cpp
 		${_SRC_DIR}/external_api/RoboChessExternalInterface.cpp
 		${_SRC_DIR}/external_api/RoboChessRos2ParamProvider.cpp
+        ${_SRC_DIR}/motion/ChessMoveMotionSequence.cpp
+        ${_SRC_DIR}/motion/ParkMotionSequence.cpp
+        ${_SRC_DIR}/motion/TurnEndMotionSequence.cpp
 		${_SRC_DIR}/main.cpp
 )
 

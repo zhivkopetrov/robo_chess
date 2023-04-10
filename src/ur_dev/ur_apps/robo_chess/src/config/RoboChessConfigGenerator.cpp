@@ -11,6 +11,15 @@
 #include "robo_chess/external_api/RoboChessRos2ParamProvider.h"
 
 namespace {
+const AngleAxis HOME_ORIENTATION(0, 3.148, 0);
+const AngleAxis HOME_NINENY_ORIENTATION(2.221, 2.221, 0);
+const WaypointJoint WAYPOINT_HOME_JOINT = 
+  WaypointJoint({ -90, -90, -90, -90, 90, 0 });
+const WaypointCartesian WAYPOINT_HOME_CARTESIAN = 
+  WaypointCartesian(Point3d(-0.176, -0.691, 0.502), HOME_ORIENTATION);
+constexpr double DEFAULT_MOTION_ACCELERATION = 0.5; // [m/s2]
+constexpr double DEFAULT_MOTION_VELOCITY = 0.5; // [m/s]
+
 UrContolCommonExternalBridgeConfig generetaUrContolCommonExternalBridgeConfig(
     const RoboChessRos2Params& params) {
   UrContolCommonExternalBridgeConfig cfg;
@@ -27,6 +36,85 @@ Ros2CommunicatorConfig generateRos2CommunicatorConfig(
   //block the main thread and wait for shutdown signal
   //a secondary (ActionEventHandler thread) will be spawned to process ActionEvents
   cfg.executionPolicy = ExecutionPolicy::BLOCKING;
+
+  return cfg;
+}
+
+TurnEndMotionSequenceConfig generateTurnEndMotionSequenceConfig() {
+  TurnEndMotionSequenceConfig cfg;
+
+  cfg.motionAcc = DEFAULT_MOTION_ACCELERATION; 
+  cfg.motionVel = DEFAULT_MOTION_VELOCITY;
+
+  //TODO parse from files
+  cfg.homeCartesian = WAYPOINT_HOME_CARTESIAN;
+  cfg.turnEndApproachCartesian = WaypointCartesian(
+    Point3d(-0.196, -0.812, 0.6), HOME_ORIENTATION);
+  cfg.turnEndCartesian = WaypointCartesian(
+    Point3d(-0.196, -0.812, 0.236), HOME_ORIENTATION);
+
+  cfg.homeJoint = WAYPOINT_HOME_JOINT;
+
+  cfg.turnEndJoint = 
+    WaypointJoint({ -92.42, -127.52, -126.75, 74.27, 91.99, 0 });
+
+  cfg.turnEndApproachJoint = 
+    WaypointJoint({ -92.42, -94.62, -118.4, 33.02, 92.71, 0 });
+
+  return cfg;
+}
+
+ChessMoveMotionSequenceConfig generateChessMoveMotionSequenceConfig() {
+  ChessMoveMotionSequenceConfig cfg;
+
+  ChessPieceDimensions& pieceDimensions = cfg.chessPieceDimensions;
+  //TODO populate from config
+  pieceDimensions.width = 0.032;  // [m]
+  pieceDimensions.depth = 0.032;  // [m]
+  pieceDimensions.height = 0.064; // [m]
+
+  constexpr double gripperOpeningAddition = 0.015; // [m]
+
+  //cummulative opening of 40 mm between gripper fingers
+  constexpr int32_t m_to_mm_ratio = 1000;
+  cfg.gripperOpening = static_cast<int32_t>(
+    (pieceDimensions.depth + gripperOpeningAddition) * m_to_mm_ratio);
+
+  cfg.motionAcc = DEFAULT_MOTION_ACCELERATION; 
+  cfg.motionVel = DEFAULT_MOTION_VELOCITY;
+
+  //TODO parse from files
+  cfg.homeJoint = WAYPOINT_HOME_JOINT;
+  cfg.graspApproachJoint = 
+    WaypointJoint({ -34.79, -99.07, -82.88, -88.33, 90.22, 55.23 });
+
+  cfg.zeroOrientation = HOME_ORIENTATION;
+  cfg.ninetyOrientation = HOME_NINENY_ORIENTATION;
+  cfg.homeCartesian = WAYPOINT_HOME_CARTESIAN;
+  cfg.graspApproachCartesian = WaypointCartesian(
+    Point3d(0.545, -0.592, 0.475), HOME_ORIENTATION);
+
+  return cfg;
+}
+
+ParkMotionSequenceConfig generateParkMotionSequenceConfig() {
+  ParkMotionSequenceConfig cfg;
+
+  cfg.motionAcc = DEFAULT_MOTION_ACCELERATION; 
+  cfg.motionVel = DEFAULT_MOTION_VELOCITY;
+
+  //TODO parse from files
+  cfg.homeCartesian = WAYPOINT_HOME_CARTESIAN;
+  cfg.homeJoint = WAYPOINT_HOME_JOINT;
+
+  return cfg;
+}
+
+RoboChessMotionSequenceConfig generateRoboChessMotionSequenceConfig() {
+  RoboChessMotionSequenceConfig cfg;
+  cfg.chessMoveMotionSequenceCfg = generateChessMoveMotionSequenceConfig();
+  cfg.turnEndMotionSequenceCfg = generateTurnEndMotionSequenceConfig();
+  cfg.parkMotionSequenceCfg = generateParkMotionSequenceConfig();
 
   return cfg;
 }
@@ -70,6 +158,7 @@ RoboChessConfig RoboChessConfigGenerator::generateConfig() {
   cfg.urControlExternalInterfaceCfg =
       generetaUrContolCommonExternalBridgeConfig(rosParams);
   cfg.ros2CommunicatorCfg = generateRos2CommunicatorConfig(rosParams);
+  cfg.roboChessMotionSequenceCfg = generateRoboChessMotionSequenceConfig();
   cfg.actionEventHandlerPolicy = ActionEventHandlerPolicy::BLOCKING;
 
   return cfg;
