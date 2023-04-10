@@ -8,14 +8,12 @@
 #include "utils/Log.h"
 
 //Own components headers
-#include "robo_chess/defines/UrControlBloomDefines.h"
 
 ChessMoveMotionSequence::ChessMoveMotionSequence(
   const ChessMoveMotionSequenceConfig& cfg, const std::string& name, int32_t id, 
   const std::shared_ptr<UrScriptBuilder>& urScriptBuilder) 
-  : MotionSequence(name, id, urScriptBuilder), _cfg(cfg),
-  _stateFileHandler(stateFileHandler) {
-  loadState();
+  : MotionSequence(name, id, urScriptBuilder), _cfg(cfg) {
+
 }
 
 void ChessMoveMotionSequence::start(const UrscriptsBatchDoneCb& cb) {
@@ -212,134 +210,5 @@ void ChessMoveMotionSequence::handleSuccessfulPlacement() {
     towerStr = TowerDirection::A_TO_B == _state.towerDirection ? 
       TOWER_DIR_A_TO_B_STR : TOWER_DIR_B_TO_A_STR;
     LOGM("Swapping towers. New TowerDir: [%s]", towerStr.c_str());
-  }
-}
-
-WaypointCartesian ChessMoveMotionSequence::computeObjectPose(
-  const Point3d& towerCenter, int32_t objectIdx) const {
-  //block position have a repetative nature
-  //odd index floors has +- depth, zero orientation
-  //even index floors has +- depth, 90 deg rotated orientation
-  constexpr int32_t blocksPerRepeat = 4;
-  constexpr int32_t oddFloorFirstBlockIdx = 0;
-  constexpr int32_t oddFloorSecondBlockIdx = 1;
-  constexpr int32_t evenFloorFirstBlockIdx = 2;
-  constexpr int32_t evenFloorSecondBlockIdx = 3;
-  const int32_t floorIdx = objectIdx / 2;
-
-  Point3d objectPos = towerCenter;
-  objectPos.z += floorIdx * _cfg.blockDimensions.height;
-  AngleAxis objectOrientation;
-  switch (objectIdx % blocksPerRepeat)
-  {
-  case oddFloorFirstBlockIdx:
-    objectPos.x += _cfg.blockDimensions.depth;
-    objectOrientation = _cfg.zeroOrientation;
-    break;
-
-  case oddFloorSecondBlockIdx:
-    objectPos.x -= _cfg.blockDimensions.depth;
-    objectOrientation = _cfg.zeroOrientation;
-    break;
-
-  case evenFloorFirstBlockIdx:
-    objectPos.y += _cfg.blockDimensions.depth;
-    objectOrientation = _cfg.ninetyOrientation;
-    break;
-
-  case evenFloorSecondBlockIdx:
-    objectPos.y -= _cfg.blockDimensions.depth;
-    objectOrientation = _cfg.ninetyOrientation;
-    break;
-  }
-
-  return WaypointCartesian(objectPos, objectOrientation);
-}
-
-void ChessMoveMotionSequence::loadState() {
-  _state.holdingObject = [this](){
-    std::string strValue;
-    const ErrorCode errCode = _stateFileHandler->getEntry(
-      Motion::ChessMove::SECTION_NAME, Motion::ChessMove::HOLDING_OBJECT_ENTRY_NAME, 
-      strValue);
-    if (ErrorCode::SUCCESS != errCode) {
-      LOGERR("Error trying to getEntry(): [%s] for section: [%s]. "
-            "Defaulting to [%s]", Motion::ChessMove::HOLDING_OBJECT_ENTRY_NAME, 
-            Motion::ChessMove::SECTION_NAME, BOOL_FALSE_VALUE_STR);
-      return false;
-    }
-
-    if (BOOL_TRUE_VALUE_STR == strValue) {
-      return true;
-    }
-    return false;
-  }();
-
-  _state.towerDirection = [this](){
-    constexpr auto defaultDir = TowerDirection::A_TO_B;
-    std::string strValue;
-    const ErrorCode errCode = _stateFileHandler->getEntry(
-      Motion::ChessMove::SECTION_NAME, Motion::ChessMove::DIRECTION_ENTRY_NAME, 
-      strValue);
-    if (ErrorCode::SUCCESS != errCode) {
-      LOGERR("Error trying to getEntry(): [%s] for section: [%s]. "
-             "Defaulting to [%s]", Motion::ChessMove::DIRECTION_ENTRY_NAME, 
-             Motion::ChessMove::SECTION_NAME, TOWER_DIR_A_TO_B_STR);
-      return defaultDir;
-    }
-
-    if (TOWER_DIR_A_TO_B_STR == strValue) {
-      return TowerDirection::A_TO_B;
-    }
-    return TowerDirection::B_TO_A;
-  }();
-
-  _state.currentObjectIdx = [this](){
-    constexpr auto defaultCurrObjIdx = 0;
-    std::string strValue;
-    const ErrorCode errCode = _stateFileHandler->getEntry(
-      Motion::ChessMove::SECTION_NAME, Motion::ChessMove::CURRENT_OBJECT_IDX_ENTRY_NAME, 
-      strValue);
-    if (ErrorCode::SUCCESS != errCode) {
-      LOGERR("Error trying to getEntry(): [%s] for section: [%s]. "
-             "Defaulting to [%d]", Motion::ChessMove::CURRENT_OBJECT_IDX_ENTRY_NAME, 
-             Motion::ChessMove::SECTION_NAME, defaultCurrObjIdx);
-      return defaultCurrObjIdx;
-    }
-
-    try {
-      return std::stoi(strValue);
-    } catch (const std::exception &e) {
-      LOGERR("%s", e.what());
-      return defaultCurrObjIdx;
-    }
-  }();
-}
-
-void ChessMoveMotionSequence::serializeState() {
-  const std::string holdingObjStr = _state.holdingObject ? 
-    BOOL_TRUE_VALUE_STR : BOOL_FALSE_VALUE_STR;
-  ErrorCode errCode = _stateFileHandler->updateEntry(
-    Motion::ChessMove::SECTION_NAME, Motion::ChessMove::HOLDING_OBJECT_ENTRY_NAME, 
-    holdingObjStr);
-  if (ErrorCode::SUCCESS != errCode) {
-    LOGERR("Error trying to serialize ChessMoveMotionSequenceState");
-  }
-
-  errCode = _stateFileHandler->updateEntry(
-    Motion::ChessMove::SECTION_NAME, Motion::ChessMove::CURRENT_OBJECT_IDX_ENTRY_NAME, 
-    std::to_string(_state.currentObjectIdx));
-  if (ErrorCode::SUCCESS != errCode) {
-    LOGERR("Error trying to serialize ChessMoveMotionSequenceState");
-  }
-
-  const std::string directionStr = 
-    TowerDirection::A_TO_B == _state.towerDirection ? 
-      TOWER_DIR_A_TO_B_STR : TOWER_DIR_B_TO_A_STR;
-  errCode = _stateFileHandler->updateEntry(
-    Motion::ChessMove::SECTION_NAME, Motion::ChessMove::DIRECTION_ENTRY_NAME, 
-    directionStr);
-  if (ErrorCode::SUCCESS != errCode) {
-    LOGERR("Error trying to serialize ChessMoveMotionSequenceState");
   }
 }

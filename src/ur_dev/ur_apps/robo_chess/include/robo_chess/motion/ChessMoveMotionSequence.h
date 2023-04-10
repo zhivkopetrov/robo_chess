@@ -16,8 +16,7 @@ class ChessMoveMotionSequence final : public MotionSequence {
 public:
   ChessMoveMotionSequence(
     const ChessMoveMotionSequenceConfig& cfg, const std::string& name, int32_t id,
-    const std::shared_ptr<UrScriptBuilder>& urScriptBuilder,
-    const std::shared_ptr<StateFileHandler>& stateFileHandler);
+    const std::shared_ptr<UrScriptBuilder>& urScriptBuilder);
 
   void start(const UrscriptsBatchDoneCb& cb) override;
   void gracefulStop(const UrscriptsBatchDoneCb& cb) override;
@@ -41,26 +40,12 @@ private:
 
   void handleSuccessfulPlacement();
 
-  WaypointCartesian computeObjectPose(
-    const Point3d& towerCenter, int32_t objectIdx) const;
-
-  void loadState();
-  void serializeState();
-
-  enum class TowerDirection {
-    A_TO_B,
-    B_TO_A
-  };
-
   struct ChessMoveState {
-    int32_t currentObjectIdx = 0;
-    TowerDirection towerDirection = TowerDirection::A_TO_B;
     bool holdingObject = false;
   };
 
   const ChessMoveMotionSequenceConfig _cfg;
   ChessMoveState _state;
-  std::shared_ptr<StateFileHandler> _stateFileHandler;
 };
 
 #endif /* ROBO_CHESS_CHESSMOVEMOTIONSEQUENCE_H_ */

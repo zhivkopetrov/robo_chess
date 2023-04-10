@@ -24,10 +24,6 @@ public:
   ErrorCode setTransportStrategy(int32_t strategyId) override;
 
 private:
-  struct TurnEndState {
-    bool holdingObject = false;
-  };
-
   //==========START stateful commands===========
   UrscriptCommand generateGraspCommand();
 
@@ -39,28 +35,11 @@ private:
 
   UrscriptCommand generateTransportCommand();
 
-  std::vector<UrscriptCommand> 
-    generateGracefullyStopPlaceAndReturnHomeStrategy();
-  std::vector<UrscriptCommand> 
-    generateGracefullyStopWaitAfterTransportStrategy();
-  //===========END stateful commands============
-
-  //used for TurnEndEndStrategy::PLACE_AND_RETURN_HOME strategy
   UrscriptCommand generateRetractAndReturnHomeCommand() const;
   UrscriptCommand generateReturnHomeCommand() const;
   UrscriptCommand generateGripperActuateCommand(GripperActuateType type) const;
 
-  TransportMoveCommands generateTransportMoveCommands(
-    Motion::TurnEnd::TransportStrategy strategy) const;
-  TransportMoveCommands generateBasicTransportMoveCommands() const;
-  TransportMoveCommands generateFullRotationTransportMoveCommands() const;
-  TransportMoveCommands generateTwistTransportMoveCommands() const;
-
-  void loadState();
-  void serializeState();
-
   const TurnEndMotionSequenceConfig _cfg;
-  TurnEndState _state;
 };
 
 #endif /* ROBO_CHESS_TURNENDMOTIONSEQUENCE_H_ */

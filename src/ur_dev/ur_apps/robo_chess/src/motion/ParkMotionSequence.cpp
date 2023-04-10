@@ -49,7 +49,7 @@ UrscriptCommand ParkMotionSequence::generateReturnHomeCommand() const {
   UrScriptCommandContainer cmdContainer;
   cmdContainer.addCommand(std::move(returnHomeCommand));
   const UrScriptPayload cmdPayload = 
-    constructUrScript(Motion::Park::PARK_NAME, cmdContainer);
+    constructUrScript(motion::park::PARK_NAME, cmdContainer);
 
   return { cmdPayload };
 }
