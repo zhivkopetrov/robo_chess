@@ -6,6 +6,7 @@
 #include <memory>
 
 //Other libraries headers
+#include "robo_chess_common/defines/RoboChessCommonDefines.h"
 #include "ur_control_common/external_api/UrControlCommonExternalBridge.h"
 #include "ur_control_common/external_api/DashboardProvider.h"
 #include "ur_control_common/motion/MotionExecutor.h"
@@ -40,6 +41,14 @@ public:
 private:
   void deinit();
   void unloadDependencies();
+
+  //TODO move to new object
+  void abortMotion(AbortMotion type);
+  void chessMove(ChessMoveType type, const std::string& currPos, 
+    const std::string& futurePos);
+  void park();
+  void setParkMode(ParkMode type);
+  ParkMode _parkMode = ParkMode::AUTOMATIC;
 
   std::vector<DependencyDescription> _dependencies;
   ActionEventHandlerSpawner _actionEventHandlerSpawner;

@@ -19,9 +19,47 @@ RoboChessExternalInterface::RoboChessExternalInterface()
 
 }
 
-ErrorCode RoboChessExternalInterface::init() {
+ErrorCode RoboChessExternalInterface::init(
+  const RoboChessExternalInterfaceOutInterface& outInterface) {
+  if (ErrorCode::SUCCESS != initOutInterface(outInterface)) {
+    LOGERR("Error, initOutInterface() failed");
+    return ErrorCode::FAILURE;
+  }
+
   if (ErrorCode::SUCCESS != initCommunication()) {
     LOGERR("Error, initCommunication() failed");
+    return ErrorCode::FAILURE;
+  }
+
+  return ErrorCode::SUCCESS;
+}
+
+ErrorCode RoboChessExternalInterface::initOutInterface(
+  const RoboChessExternalInterfaceOutInterface& outInterface) {
+  _outInterface = outInterface;
+
+  if (nullptr == _outInterface.invokeActionEventCb) {
+    LOGERR("Error, nullptr provided for InvokeActionEventCb");
+    return ErrorCode::FAILURE;
+  }
+
+  if (nullptr == _outInterface.abortMotionCb) {
+    LOGERR("Error, nullptr provided for AbortMotionCb");
+    return ErrorCode::FAILURE;
+  }
+
+  if (nullptr == _outInterface.parkCb) {
+    LOGERR("Error, nullptr provided for ParkCb");
+    return ErrorCode::FAILURE;
+  }
+
+  if (nullptr == _outInterface.setParkModeCb) {
+    LOGERR("Error, nullptr provided for SetParkModeCb");
+    return ErrorCode::FAILURE;
+  }
+
+  if (nullptr == _outInterface.chessMoveCb) {
+    LOGERR("Error, nullptr provided for ChessMoveCb");
     return ErrorCode::FAILURE;
   }
 
@@ -68,6 +106,11 @@ void RoboChessExternalInterface::handleAbortMotionService(
     return;
   }
 
+  const auto f = [this, abortMotion](){
+    _outInterface.abortMotionCb(abortMotion);
+  };
+  _outInterface.invokeActionEventCb(f, ActionEventType::NON_BLOCKING);
+
   response->success = true;
 }
 
@@ -87,6 +130,12 @@ void RoboChessExternalInterface::handleChessMoveService(
     return;
   }
 
+  const auto f = [this, chessMoveType, request](){
+    _outInterface.chessMoveCb(
+      chessMoveType, request->curr_pos, request->future_pos);
+  };
+  _outInterface.invokeActionEventCb(f, ActionEventType::NON_BLOCKING);
+
   response->success = true;
 }
 
@@ -94,6 +143,12 @@ void RoboChessExternalInterface::handleParkService(
   [[maybe_unused]]const std::shared_ptr<RobotPark::Request> request,
   std::shared_ptr<RobotPark::Response> response) {
   LOG("Received RobotPark::Request");
+
+  const auto f = [this](){
+    _outInterface.parkCb();
+  };
+  _outInterface.invokeActionEventCb(f, ActionEventType::NON_BLOCKING);
+
   response->success = true;
 }
 
@@ -110,6 +165,11 @@ void RoboChessExternalInterface::handleSetParkModeService(
         std::to_string(request->park_mode);
     return;
   }
+
+  const auto f = [this, parkMode](){
+    _outInterface.setParkModeCb(parkMode);
+  };
+  _outInterface.invokeActionEventCb(f, ActionEventType::NON_BLOCKING);
 
   response->success = true;
 }

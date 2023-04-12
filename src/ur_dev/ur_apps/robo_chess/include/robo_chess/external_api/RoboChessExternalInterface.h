@@ -9,13 +9,23 @@
 #include "robo_chess_interfaces/srv/robot_chess_move.hpp"
 #include "robo_chess_interfaces/srv/robot_park.hpp"
 #include "robo_chess_interfaces/srv/robot_set_park_mode.hpp"
+#include "game_engine/defines/ActionEventDefines.h"
 #include "utils/class/NonCopyable.h"
 #include "utils/class/NonMoveable.h"
 #include "utils/ErrorCode.h"
 
 //Own components headers
+#include "robo_chess/defines/RoboChessFunctionalDefines.h"
 
 //Forward declarations
+
+struct RoboChessExternalInterfaceOutInterface {
+  InvokeActionEventCb invokeActionEventCb;
+  AbortMotionCb abortMotionCb;
+  ChessMoveCb chessMoveCb;
+  ParkCb parkCb;
+  SetParkModeCb setParkModeCb;
+};
 
 class RoboChessExternalInterface: public rclcpp::Node,
     public NonCopyable,
@@ -23,7 +33,7 @@ class RoboChessExternalInterface: public rclcpp::Node,
 public:
   RoboChessExternalInterface();
 
-  ErrorCode init();
+  ErrorCode init(const RoboChessExternalInterfaceOutInterface& outInterface);
 
 private:
   using RobotAbortMotion = robo_chess_interfaces::srv::RobotAbortMotion;
@@ -31,6 +41,8 @@ private:
   using RobotPark = robo_chess_interfaces::srv::RobotPark;
   using RobotSetParkMode = robo_chess_interfaces::srv::RobotSetParkMode;
 
+  ErrorCode initOutInterface(
+    const RoboChessExternalInterfaceOutInterface& outInterface);
   ErrorCode initCommunication();
 
   void handleAbortMotionService(
@@ -56,6 +68,8 @@ private:
 
   const rclcpp::CallbackGroup::SharedPtr _callbackGroup = create_callback_group(
       rclcpp::CallbackGroupType::Reentrant);
+
+  RoboChessExternalInterfaceOutInterface _outInterface;
 };
 
 #endif /* ROBO_CHESS_ROBOCHESSEXTERNALINTERFACE_H */

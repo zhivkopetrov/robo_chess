@@ -72,8 +72,8 @@ ErrorCode RoboChessApplicationInitHelper::initInternal(
     return ErrorCode::FAILURE;
   }
 
-  if (ErrorCode::SUCCESS != app._roboChessExternalInterface->init()) {
-    LOGERR("Error in RoboChessExternalInterface.init()");
+  if (ErrorCode::SUCCESS != initRoboChessExternalInterface(app)) {
+    LOGERR("Error in initRoboChessExternalInterface()");
     return ErrorCode::FAILURE;
   }
 
@@ -116,6 +116,29 @@ ErrorCode RoboChessApplicationInitHelper::initUrControlExternalBridge(
   if (ErrorCode::SUCCESS !=
       app._urControlExternalInterface->init(cfg, outInterface)) {
     LOGERR("Error in UrControlCommonExternalBridge.init()");
+    return ErrorCode::FAILURE;
+  }
+
+  return ErrorCode::SUCCESS;
+}
+
+ErrorCode RoboChessApplicationInitHelper::initRoboChessExternalInterface(
+  RoboChessApplication& app) {
+  RoboChessExternalInterfaceOutInterface outInterface;
+  outInterface.invokeActionEventCb = 
+    std::bind(&ActionEventHandlerSpawner::invokeActionEvent, 
+    &app._actionEventHandlerSpawner, _1, _2);
+  outInterface.abortMotionCb = 
+    std::bind(&RoboChessApplication::abortMotion, &app, _1);
+  outInterface.chessMoveCb = 
+    std::bind(&RoboChessApplication::chessMove, &app, _1, _2, _3);
+  outInterface.parkCb = std::bind(&RoboChessApplication::park, &app);
+  outInterface.setParkModeCb = 
+    std::bind(&RoboChessApplication::setParkMode, &app, _1);
+
+  if (ErrorCode::SUCCESS != 
+      app._roboChessExternalInterface->init(outInterface)) {
+    LOGERR("Error in RoboChessExternalInterface.init()");
     return ErrorCode::FAILURE;
   }
 

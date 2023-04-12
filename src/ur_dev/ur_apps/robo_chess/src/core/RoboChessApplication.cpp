@@ -9,6 +9,7 @@
 
 //Own components headers
 #include "robo_chess/core/helpers/RoboChessApplicationInitHelper.h"
+#include "robo_chess/defines/RoboChessDefines.h"
 
 RoboChessApplication::~RoboChessApplication() noexcept {
   LOGG("RoboChess initiating shutdown ...");
@@ -69,4 +70,33 @@ void RoboChessApplication::unloadDependencies() {
       ++revIt) {
     revIt->unloadDependencyCb();
   }
+}
+
+void RoboChessApplication::abortMotion(AbortMotion type) {
+  _motionExecutor.loadSequence(motion::PARK_MOTION_ID);
+  const MotionAction motionType = 
+    (AbortMotion::GRACEFUL_STOP == type) ? 
+      MotionAction::GRACEFUL_STOP : MotionAction::ABORT;
+
+  const UrscriptsBatchDoneCb emptyCb = [](){};
+  _motionExecutor.performAction(motionType, emptyCb);
+}
+
+void RoboChessApplication::chessMove(
+  [[maybe_unused]]ChessMoveType type, 
+  [[maybe_unused]]const std::string& currPos, 
+  [[maybe_unused]]const std::string& futurePos) {
+  const UrscriptsBatchDoneCb emptyCb = [](){};
+  _motionExecutor.loadSequence(motion::CHESS_MOVE_MOTION_ID);
+  _motionExecutor.performAction(MotionAction::START, emptyCb);
+}
+
+void RoboChessApplication::park() {
+  const UrscriptsBatchDoneCb emptyCb = [](){};
+  _motionExecutor.loadSequence(motion::PARK_MOTION_ID);
+  _motionExecutor.performAction(MotionAction::START, emptyCb);
+}
+
+void RoboChessApplication::setParkMode(ParkMode type) {
+  _parkMode = type;
 }

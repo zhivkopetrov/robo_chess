@@ -30,6 +30,8 @@ private:
   static ErrorCode initUrControlExternalBridge(
     const UrContolCommonExternalBridgeConfig& cfg, RoboChessApplication& app);
 
+  static ErrorCode initRoboChessExternalInterface(RoboChessApplication& app);
+
   static ErrorCode initDashboardHelper(RoboChessApplication &app);
 
   static ErrorCode initMotionExecutor(
