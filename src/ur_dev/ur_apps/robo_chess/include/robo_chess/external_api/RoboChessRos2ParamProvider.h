@@ -6,6 +6,7 @@
 
 //Other libraries headers
 #include <rclcpp/node.hpp>
+#include "urscript_common/defines/UrScriptDefines.h"
 #include "ros2_game_engine/communicator/config/Ros2CommunicatorConfig.h"
 
 //Own components headers
@@ -14,6 +15,7 @@
 
 struct RoboChessRos2Params {
   Ros2CommunicatorConfig ros2CommunicatorCfg;
+  GripperType gripperType = GripperType::SIMULATION;
   std::string robotIp;
   uint16_t robotInterfacePort { };
 

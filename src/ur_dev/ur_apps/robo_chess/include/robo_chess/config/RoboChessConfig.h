@@ -7,6 +7,7 @@
 
 //Other libraries headers
 #include "ur_control_common/external_api/config/UrContolCommonExternalBridgeConfig.h"
+#include "urscript_common/urscript/config/UrScriptBuilderConfig.h"
 #include "ros2_game_engine/communicator/config/Ros2CommunicatorConfig.h"
 #include "game_engine/defines/ActionEventDefines.h"
 
@@ -19,6 +20,7 @@ struct RoboChessConfig {
   Ros2CommunicatorConfig ros2CommunicatorCfg;
   UrContolCommonExternalBridgeConfig urControlExternalInterfaceCfg;
   RoboChessMotionSequenceConfig roboChessMotionSequenceCfg;
+  UrScriptBuilderConfig urScriptBuilderCfg;
   ActionEventHandlerPolicy actionEventHandlerPolicy = 
     ActionEventHandlerPolicy::BLOCKING;
 };

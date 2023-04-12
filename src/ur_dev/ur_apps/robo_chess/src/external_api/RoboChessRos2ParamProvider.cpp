@@ -15,6 +15,7 @@
 namespace {
 constexpr auto NODE_NAME = "RoboChessRos2ParamProvider";
 
+constexpr auto GRIPPER_TYPE_PARAM_NAME = "gripper_type";
 constexpr auto ROS2_EXECUTOR_TYPE_PARAM_NAME = "ros2_executor_type";
 constexpr auto ROS2_EXECUTOR_THREADS_NUM_PARAM_NAME =
     "ros2_executor_threads_num";
@@ -29,6 +30,9 @@ constexpr auto DEFAULT_EXECUTOR_THREADS_NUM = 2;
 //robot
 constexpr auto DEFAULT_ROBOT_IP = "192.168.1.102";
 constexpr uint16_t DEFAULT_ROBOT_INTERFACE_PORT = 30003;
+
+//misc
+constexpr auto DEFAULT_GRIPPER_TYPE = getEnumValue(GripperType::SIMULATION);
 
 template <typename T>
 void handleParamError(const char *paramName, T &value, const T &defaultValue) {
@@ -45,6 +49,9 @@ void RoboChessRos2Params::print() const {
   std::ostringstream ostr;
   ostr << "==================================================================\n"
        << "Printing node(" << NODE_NAME << ") params:\n"
+       << GRIPPER_TYPE_PARAM_NAME << ": " <<
+         (GripperType::HARDWARE == gripperType ? "Hardware" : "Simulation") 
+          << '\n'
        << ROS2_EXECUTOR_TYPE_PARAM_NAME << ": " <<
          getExecutorName(ros2CommunicatorCfg.executorType) << '\n'
        << ROS2_EXECUTOR_THREADS_NUM_PARAM_NAME << ": "
@@ -62,12 +69,19 @@ void RoboChessRos2Params::validate() {
     handleParamError(ROS2_EXECUTOR_THREADS_NUM_PARAM_NAME,
         ros2CommunicatorCfg.numberOfThreads, maxHardwareThreads);
   }
+  if ((GripperType::HARDWARE != gripperType) && 
+      (GripperType::SIMULATION != gripperType)) {
+    LOGERR("Error, received unsupported GripperType: [%d]. Defaulting to "
+           "GripperType::SIMULATION", getEnumValue(gripperType));
+    gripperType = GripperType::SIMULATION;
+  }
 
   //TODO validate ip and port
 }
 
 RoboChessRos2ParamProvider::RoboChessRos2ParamProvider()
     : rclcpp::Node(NODE_NAME) {
+  declare_parameter<int32_t>(GRIPPER_TYPE_PARAM_NAME, DEFAULT_GRIPPER_TYPE);
   declare_parameter<int32_t>(ROS2_EXECUTOR_TYPE_PARAM_NAME,
       DEFAULT_EXECUTOR_TYPE);
   declare_parameter<int32_t>(ROS2_EXECUTOR_THREADS_NUM_PARAM_NAME,
@@ -79,6 +93,10 @@ RoboChessRos2ParamProvider::RoboChessRos2ParamProvider()
 }
 
 RoboChessRos2Params RoboChessRos2ParamProvider::getParams() {
+  int32_t gripperTypeInt{};
+  get_parameter(GRIPPER_TYPE_PARAM_NAME, gripperTypeInt);
+  _params.gripperType = toEnum<GripperType>(gripperTypeInt);
+  
   int32_t executorTypeInt{};
   get_parameter(ROS2_EXECUTOR_TYPE_PARAM_NAME, executorTypeInt);
   _params.ros2CommunicatorCfg.executorType =

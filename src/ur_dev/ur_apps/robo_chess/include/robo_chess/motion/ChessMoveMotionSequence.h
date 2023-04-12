@@ -30,9 +30,6 @@ private:
   UrscriptCommand generateTransportAndPlaceCommand(
     const WaypointCartesian& currPose, const WaypointCartesian& placePose);
 
-  UrscriptCommand generateReturnHomeCommand();
-  UrscriptCommand generateReturnHomeAndOpenGripperCommand();
-
   //Generates a full pick and place plan for the current ChessMove tower sequence.
   //This could be a partial sequence if the ChessMove sequence was stopped/aborte.
   //Or it could be a complete ChessMove sequence.

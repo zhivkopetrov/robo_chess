@@ -1,6 +1,11 @@
 /RoboChessRos2ParamProvider:
   ros__parameters:
     use_sim_time: false
+
+    #supported gripper types:
+      #HARDWARE(0)
+      #SIMULATION(1)
+    gripper_type: 1
     
     #supported executor types:
       #SINGLE_THREADED(0)

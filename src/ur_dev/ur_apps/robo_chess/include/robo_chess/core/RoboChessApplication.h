@@ -8,6 +8,8 @@
 //Other libraries headers
 #include "ur_control_common/external_api/UrControlCommonExternalBridge.h"
 #include "ur_control_common/external_api/DashboardProvider.h"
+#include "ur_control_common/motion/MotionExecutor.h"
+#include "urscript_common/urscript/UrScriptBuilder.h"
 #include "ros2_game_engine/communicator/Ros2Communicator.h"
 #include "game_engine/defines/DependencyDefines.h"
 #include "utils/class/NonCopyable.h"
@@ -42,10 +44,12 @@ private:
   std::vector<DependencyDescription> _dependencies;
   ActionEventHandlerSpawner _actionEventHandlerSpawner;
   RobotModeHandler _robotModeHandler;
+  MotionExecutor _motionExecutor;
+  std::shared_ptr<UrScriptBuilder> _urScriptBuilder;
 
   //ROS2 related objects
-  std::shared_ptr<DashboardProvider> _dashboardProvider;
   std::unique_ptr<Ros2Communicator> _communicator;
+  std::shared_ptr<DashboardProvider> _dashboardProvider;
   std::shared_ptr<RoboChessExternalInterface> _roboChessExternalInterface;
   std::shared_ptr<UrControlCommonExternalBridge> _urControlExternalInterface;
 };

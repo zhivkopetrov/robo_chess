@@ -8,9 +8,9 @@ project(
     VERSION 1.0.0
 )
 
+find_package(ament_cmake REQUIRED)
 find_package(cmake_helpers REQUIRED)
 find_package(utils REQUIRED)
-find_package(ament_cmake REQUIRED)
 find_package(robo_chess_interfaces REQUIRED)
 
 set(_INC_FOLDER_NAME include)
@@ -55,7 +55,7 @@ ament_target_dependencies(
 ament_export_dependencies(
     ${PROJECT_NAME}
         PUBLIC
-        robo_chess_interfaces
+            robo_chess_interfaces
 )
 
 if(NOT DISABLE_ROS_TOOLING)

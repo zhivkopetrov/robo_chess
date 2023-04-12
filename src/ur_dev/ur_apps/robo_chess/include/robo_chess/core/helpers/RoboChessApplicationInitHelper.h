@@ -12,6 +12,8 @@
 class RoboChessApplication;
 struct RoboChessConfig;
 struct UrContolCommonExternalBridgeConfig;
+struct RoboChessMotionSequenceConfig;
+struct UrScriptBuilderConfig;
 
 class RoboChessApplicationInitHelper {
 public:
@@ -28,12 +30,13 @@ private:
   static ErrorCode initUrControlExternalBridge(
     const UrContolCommonExternalBridgeConfig& cfg, RoboChessApplication& app);
 
-  static ErrorCode initDashboardHelper(
-      const UrControlCommonLayoutInterface &layoutInterface, 
-      UrControlBloom &bloom);
+  static ErrorCode initDashboardHelper(RoboChessApplication &app);
 
   static ErrorCode initMotionExecutor(
-    const UrControlBloomMotionSequenceConfig &cfg, UrControlBloom &bloom);
+    const RoboChessMotionSequenceConfig &cfg, RoboChessApplication &app);
+
+  static ErrorCode initUrScriptBuilder(
+    const UrScriptBuilderConfig &cfg, RoboChessApplication &app);
 };
 
 #endif /* ROBO_CHESS_ROBOCHESSAPPLICATIONINITHELPER_H_ */

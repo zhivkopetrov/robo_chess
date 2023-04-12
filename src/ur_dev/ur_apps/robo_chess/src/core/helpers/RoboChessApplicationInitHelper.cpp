@@ -8,8 +8,14 @@
 
 //Own components headers
 #include "robo_chess/core/RoboChessApplication.h"
+#include "robo_chess/defines/RoboChessDefines.h"
+#include "robo_chess/motion/ChessMoveMotionSequence.h"
+#include "robo_chess/motion/ParkMotionSequence.h"
+#include "robo_chess/motion/TurnEndMotionSequence.h"
 
 namespace {
+using namespace std::placeholders;
+
 constexpr auto UR_CONTROL_EXTERNAL_BRIDGE_NODE_NAME = 
   "UrControlBloomExternalBridge";
 }
@@ -39,10 +45,13 @@ ErrorCode RoboChessApplicationInitHelper::createObjects(
   app._urControlExternalInterface = 
    std::make_shared<UrControlCommonExternalBridge>(
       UR_CONTROL_EXTERNAL_BRIDGE_NODE_NAME);
+  app._dashboardProvider = std::make_shared<DashboardProvider>();
+  app._urScriptBuilder = std::make_shared<UrScriptBuilder>();
 
   if (!app._communicator || 
       !app._roboChessExternalInterface || 
-      !app._urControlExternalInterface) {
+      !app._urControlExternalInterface ||
+      !app._dashboardProvider) {
     LOGERR("Error, bad alloc for objects");
     return ErrorCode::FAILURE;
   }
@@ -74,13 +83,27 @@ ErrorCode RoboChessApplicationInitHelper::initInternal(
     return ErrorCode::FAILURE;
   }
 
+  if (ErrorCode::SUCCESS != initDashboardHelper(app)) {
+    LOGERR("Error in initDashboardHelper()");
+    return ErrorCode::FAILURE;
+  }
+
+  if (ErrorCode::SUCCESS != 
+      initMotionExecutor(cfg.roboChessMotionSequenceCfg, app)) {
+    LOGERR("Error in initMotionExecutor()");
+    return ErrorCode::FAILURE;
+  }
+
+  if (ErrorCode::SUCCESS != initUrScriptBuilder(cfg.urScriptBuilderCfg, app)) {
+    LOGERR("initUrScriptBuilder() failed");
+    return ErrorCode::FAILURE;
+  }
+
   return ErrorCode::SUCCESS;
 }
 
 ErrorCode RoboChessApplicationInitHelper::initUrControlExternalBridge(
     const UrContolCommonExternalBridgeConfig& cfg, RoboChessApplication& app) {
-  using namespace std::placeholders;
-
   UrControlCommonExternalBridgeOutInterface outInterface;
   outInterface.invokeActionEventCb =
     std::bind(&ActionEventHandlerSpawner::invokeActionEvent, 
@@ -99,15 +122,18 @@ ErrorCode RoboChessApplicationInitHelper::initUrControlExternalBridge(
   return ErrorCode::SUCCESS;
 }
 
-ErrorCode UrControlBloomInitHelper::initDashboardHelper(
-    const UrControlCommonLayoutInterface &layoutInterface, 
-    UrControlBloom &bloom) {
+ErrorCode RoboChessApplicationInitHelper::initDashboardHelper(
+    RoboChessApplication &app) {
   DashboardProviderOutInterface outInterface;
-  outInterface.invokeActionEventCb = bloom._invokeActionEventCb;
-  outInterface.robotModeChangeCb = layoutInterface.robotModeChangeCb;
-  outInterface.safetyModeChangeCb = layoutInterface.safetyModeChangeCb;
+  outInterface.invokeActionEventCb = 
+    std::bind(&ActionEventHandlerSpawner::invokeActionEvent, 
+    &app._actionEventHandlerSpawner, _1, _2);
+  outInterface.robotModeChangeCb = 
+    std::bind(&RobotModeHandler::changeRobotMode, &app._robotModeHandler, _1);
+  outInterface.safetyModeChangeCb = 
+    std::bind(&RobotModeHandler::changeSafetyMode, &app._robotModeHandler, _1);
 
-  if (ErrorCode::SUCCESS != bloom._dashboardProvider->init(outInterface)) {
+  if (ErrorCode::SUCCESS != app._dashboardProvider->init(outInterface)) {
     LOGERR("Error in _dashboardProvider.init()");
     return ErrorCode::FAILURE;
   }
@@ -115,10 +141,10 @@ ErrorCode UrControlBloomInitHelper::initDashboardHelper(
   return ErrorCode::SUCCESS;
 }
 
-ErrorCode UrControlBloomInitHelper::initMotionExecutor(
-  const UrControlBloomMotionSequenceConfig &cfg, UrControlBloom &bloom) {
+ErrorCode RoboChessApplicationInitHelper::initMotionExecutor(
+  const RoboChessMotionSequenceConfig &cfg, RoboChessApplication &app) {
   MotionSequenceExecutorOutInterface outInterface;
-  const auto externalBridgeRawPointer = bloom._externalBridge.get();
+  const auto externalBridgeRawPointer = app._urControlExternalInterface.get();
   outInterface.publishURScriptCb = std::bind(
     &UrControlCommonExternalBridge::publishURScript, 
     externalBridgeRawPointer, _1);
@@ -131,37 +157,49 @@ ErrorCode UrControlBloomInitHelper::initMotionExecutor(
     &UrControlCommonExternalBridge::invokeURScriptPreemptService, 
     externalBridgeRawPointer);
 
-  outInterface.invokeActionEventCb = bloom._invokeActionEventCb;
+  outInterface.invokeActionEventCb = 
+    std::bind(&ActionEventHandlerSpawner::invokeActionEvent, 
+    &app._actionEventHandlerSpawner, _1, _2);
 
-  if (ErrorCode::SUCCESS != bloom._motionExecutor.init(outInterface)) {
+  if (ErrorCode::SUCCESS != app._motionExecutor.init(outInterface)) {
     LOGERR("Error in _motionExecutor.init()");
     return ErrorCode::FAILURE;
   }
 
-  auto bloomMotionSequence = std::make_unique<BloomMotionSequence>(
-    cfg.bloomMotionSequenceCfg, Motion::BLOOM_MOTION_SEQUENCE_NAME, 
-    Motion::BLOOM_MOTION_ID, bloom._urScriptBuilder, bloom._stateFileHandler);
+  auto chessMoveMotionSequence = std::make_unique<ChessMoveMotionSequence>(
+    cfg.chessMoveMotionSequenceCfg, motion::CHESS_MOVE_MOTION_SEQUENCE_NAME, 
+    motion::CHESS_MOVE_MOTION_ID, app._urScriptBuilder);
   if (ErrorCode::SUCCESS != 
-      bloom._motionExecutor.addSequence(std::move(bloomMotionSequence))) {
-    LOGERR("Error in motionExecutor.addSequence() for BloomMotionSequence");
-    return ErrorCode::FAILURE;
-  }
-
-  auto jengaMotionSequence = std::make_unique<JengaMotionSequence>(
-    cfg.jengaMotionSequenceCfg, Motion::JENGA_MOTION_SEQUENCE_NAME, 
-    Motion::JENGA_MOTION_ID, bloom._urScriptBuilder, bloom._stateFileHandler);
-  if (ErrorCode::SUCCESS != 
-      bloom._motionExecutor.addSequence(std::move(jengaMotionSequence))) {
-    LOGERR("Error in motionExecutor.addSequence() for JengaMotionSequence");
+      app._motionExecutor.addSequence(std::move(chessMoveMotionSequence))) {
+    LOGERR("Error in motionExecutor.addSequence() for ChessMoveMotionSequence");
     return ErrorCode::FAILURE;
   }
 
   auto parkMotionSequence = std::make_unique<ParkMotionSequence>(
-    cfg.parkMotionSequenceCfg, Motion::PARK_MOTION_SEQUENCE_NAME, 
-    Motion::PARK_ID, bloom._urScriptBuilder, bloom._stateFileHandler);
+    cfg.parkMotionSequenceCfg, motion::PARK_MOTION_SEQUENCE_NAME, 
+    motion::PARK_MOTION_ID, app._urScriptBuilder);
   if (ErrorCode::SUCCESS != 
-      bloom._motionExecutor.addSequence(std::move(parkMotionSequence))) {
+      app._motionExecutor.addSequence(std::move(parkMotionSequence))) {
     LOGERR("Error in motionExecutor.addSequence() for ParkMotionSequence");
+    return ErrorCode::FAILURE;
+  }
+
+  auto turnEndMotionSequence = std::make_unique<TurnEndMotionSequence>(
+    cfg.turnEndMotionSequenceCfg, motion::TURN_END_MOTION_SEQUENCE_NAME, 
+    motion::TURN_END_MOTION_ID, app._urScriptBuilder);
+  if (ErrorCode::SUCCESS != 
+      app._motionExecutor.addSequence(std::move(turnEndMotionSequence))) {
+    LOGERR("Error in motionExecutor.addSequence() for TurnEndMotionSequence");
+    return ErrorCode::FAILURE;
+  }
+
+  return ErrorCode::SUCCESS;
+}
+
+ErrorCode RoboChessApplicationInitHelper::initUrScriptBuilder(
+    const UrScriptBuilderConfig &cfg, RoboChessApplication &app) {
+  if (ErrorCode::SUCCESS != app._urScriptBuilder->init(cfg)) {
+    LOGERR("Error in _urScriptBuilder->init()");
     return ErrorCode::FAILURE;
   }
 

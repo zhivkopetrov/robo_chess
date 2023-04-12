@@ -24,8 +24,7 @@ constexpr auto TURN_END_MOTION_SEQUENCE_NAME = "TurnEndMotionSequence";
 namespace chess_move {
 
 constexpr auto GRASP_NAME = "ChessMoveGrasp";
-constexpr auto TRANSPORT_NAME = "ChessMoveTransport";
-constexpr auto PLACE_NAME = "ChessMovePlace";
+constexpr auto TRANSPORT_AND_PLACE_NAME = "ChessMoveTransportAndPlace";
 constexpr auto RETRACT_NAME = "ChessMoveRetract";
 
 } //namespace chess_move

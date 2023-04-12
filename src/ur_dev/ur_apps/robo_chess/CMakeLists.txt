@@ -8,11 +8,14 @@ project(
     VERSION 2.0.0
 )
 
+find_package(ament_cmake REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(cmake_helpers REQUIRED)
 find_package(ur_control_common REQUIRED)
 find_package(ros2_game_engine REQUIRED)
 find_package(robo_chess_common REQUIRED)
 
+set(_RESOURCE_FOLDER_NAME resources)
 set(_INC_FOLDER_NAME include)
 set(_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${_INC_FOLDER_NAME}/${PROJECT_NAME})
 set(_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -33,7 +36,7 @@ add_executable(
         ${_INC_DIR}/motion/config/ParkMotionSequenceConfig.h
         ${_INC_DIR}/motion/config/RoboChessMotionSequenceConfig.h
         ${_INC_DIR}/motion/config/TurnEndMotionSequenceConfig.h
-        ${_INC_DIR}/motion/config/RoboChessSequenceConfig.h
+        ${_INC_DIR}/motion/config/RoboChessMotionSequenceConfig.h
 		${_INC_DIR}/defines/RoboChessDefines.h
         ${_INC_DIR}/defines/RoboChessFunctionalDefines.h
      
@@ -52,14 +55,16 @@ add_executable(
 
 target_include_directories(
     ${PROJECT_NAME} 
-        PRIVATE
-            $<BUILD_INTERFACE:
-                ${CMAKE_CURRENT_SOURCE_DIR}/${_INC_FOLDER_NAME}
-            >
-            $<INSTALL_INTERFACE:
-                ${_INC_FOLDER_NAME}
-            >
-)
+    PRIVATE
+        $<BUILD_INTERFACE:
+            ${CMAKE_CURRENT_SOURCE_DIR}/${_INC_FOLDER_NAME}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${_RESOURCE_FOLDER_NAME}
+        >
+        $<INSTALL_INTERFACE:
+            ${_INC_FOLDER_NAME}
+            ${_RESOURCE_FOLDER_NAME}
+        >
+) 
 
 target_link_libraries(
     ${PROJECT_NAME}
@@ -72,6 +77,8 @@ target_link_libraries(
 ament_target_dependencies(
     ${PROJECT_NAME}
 		PUBLIC
+            ament_cmake
+            ament_index_cpp
             robo_chess_common
 )
 
@@ -94,3 +101,8 @@ enable_target_warnings(${PROJECT_NAME})
 set_target_visibility(${PROJECT_NAME})
 # enable_target_sanitizer(${PROJECT_NAME} "thread")
 
+# Install resources (gripper definitions)
+install(
+    DIRECTORY ${_RESOURCE_FOLDER_NAME}/
+    DESTINATION share/${PROJECT_NAME}/${_RESOURCE_FOLDER_NAME}/
+)

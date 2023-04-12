@@ -4,6 +4,9 @@
 //System headers
 
 //Other libraries headers
+#include <rclcpp/utilities.hpp>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include "resource_utils/common/ResourceFileHeader.h"
 #include "utils/ErrorCode.h"
 #include "utils/Log.h"
 
@@ -11,6 +14,10 @@
 #include "robo_chess/external_api/RoboChessRos2ParamProvider.h"
 
 namespace {
+constexpr auto PROJECT_NAME = "robo_chess";
+constexpr auto SCRIPTS_FOLDER_NAME = "scripts";
+constexpr auto GRIPPER_DEFINITIONS_FOLDER_NAME = "gripper_definitions";
+
 const AngleAxis HOME_ORIENTATION(0, 3.148, 0);
 const AngleAxis HOME_NINENY_ORIENTATION(2.221, 2.221, 0);
 const WaypointJoint WAYPOINT_HOME_JOINT = 
@@ -113,6 +120,24 @@ RoboChessMotionSequenceConfig generateRoboChessMotionSequenceConfig() {
   return cfg;
 }
 
+UrScriptBuilderConfig generateUrScriptBuilderConfig(
+  const std::string &projectInstallPrefix,
+  const RoboChessRos2Params &rosParams) {
+  UrScriptBuilderConfig cfg;
+
+  std::string scriptsFolderLocation = projectInstallPrefix;
+  scriptsFolderLocation.append("/").append(
+      ResourceFileHeader::getResourcesFolderName().append("/").append(
+          SCRIPTS_FOLDER_NAME)).append("/");
+
+  cfg.gripperDefinitionFolder = 
+    scriptsFolderLocation + GRIPPER_DEFINITIONS_FOLDER_NAME;
+
+  cfg.gripperType = rosParams.gripperType;
+
+  return cfg;
+}
+
 } //end anonymous namespace
 
 std::vector<DependencyDescription> RoboChessConfigGenerator::generateDependencies(
@@ -145,6 +170,9 @@ std::vector<DependencyDescription> RoboChessConfigGenerator::generateDependencie
 RoboChessConfig RoboChessConfigGenerator::generateConfig() {
   RoboChessConfig cfg;
 
+  const auto projectInstallPrefix =
+      ament_index_cpp::get_package_share_directory(PROJECT_NAME);
+
   auto paramProviderNode = std::make_shared<RoboChessRos2ParamProvider>();
   const auto rosParams = paramProviderNode->getParams();
   rosParams.print();
@@ -153,6 +181,8 @@ RoboChessConfig RoboChessConfigGenerator::generateConfig() {
       generetaUrContolCommonExternalBridgeConfig(rosParams);
   cfg.ros2CommunicatorCfg = generateRos2CommunicatorConfig(rosParams);
   cfg.roboChessMotionSequenceCfg = generateRoboChessMotionSequenceConfig();
+  cfg.urScriptBuilderCfg = 
+    generateUrScriptBuilderConfig(projectInstallPrefix, rosParams);
   cfg.actionEventHandlerPolicy = ActionEventHandlerPolicy::BLOCKING;
 
   return cfg;
