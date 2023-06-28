@@ -1,2 +1,2 @@
 # robo_chess
-Universal Robots application for playing chess
+[Work-In-Progress] Universal Robots application for playing chess
